@@ -3,7 +3,7 @@ from cffi import FFI
 import re
 
 class CTW_KT(Model):
-    """Context Tree Weighting over KT models with a binary alphabet.
+    """Context Tree Weighting over KT models with a fixed integer alphabet.
 
     A specialized memory and time efficient version of model.CTW with
     its default arguments.
