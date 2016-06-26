@@ -8,8 +8,9 @@ Options:
 -d DEPTH      Depth parameter used for CTW [default: 48]
 """
 
-import model
-import ac
+from compress.model import PTW, FMN, KT
+from compress.fast import CTW_KT, CTS_KT
+from compress.ac import compress_bytes, decompress_bytes
 
 import docopt
 import os
@@ -37,8 +38,6 @@ def _bytes_with_progress(file, nbytes, chunksize = 1024):
             yield b
         progress_bar(count / nbytes)
 
-import fast as modelfast
-        
 if __name__ == "__main__":
     from docopt import docopt
     args = docopt(__doc__)
@@ -46,31 +45,25 @@ if __name__ == "__main__":
     depth = int(args['-d'])
     
     if args['-m'] == "CTW":
-        probmodel = model.CTW(depth)
-    elif args['-m'] == "FastCTW":
-        probmodel = modelfast.CTW_KT(depth)
-    elif args['-m'] == "PTW:FastCTW":
-        probmodel = model.PTW(lambda: modelfast.CTW_KT(depth))
-    elif args['-m'] == "FMN:FastCTW":
-        probmodel = model.FMN(lambda: modelfast.CTW_KT(depth))
-    elif args['-m'] == "CTW_KT":
-        probmodel = model.CTW_KT(depth)
-    elif args['-m'] == "KT":
-        probmodel = model.KT()
-    elif args['-m'] == "PTW":
-        probmodel = model.PTW()
-    elif args['-m'] == "FMN":
-        probmodel = model.FMN()
+        probmodel = CTW_KT(depth)
+    elif args['-m'] == "CTS":
+        probmodel = CTS_KT(depth)
     elif args['-m'] == "PTW:CTW":
-        probmodel = model.CommonHistory(lambda history: model.PTW(lambda: model.CTW(depth, history = history)))
+        probmodel = PTW(lambda: CTW_KT(depth))
     elif args['-m'] == "FMN:CTW":
-        probmodel = model.CommonHistory(lambda history: model.FMN(lambda: model.CTW(depth, history = history)))
+        probmodel = FMN(lambda: CTW_KT(depth))
+    elif args['-m'] == "KT":
+        probmodel = KT()
+    elif args['-m'] == "PTW":
+        probmodel = PTW()
+    elif args['-m'] == "FMN":
+        probmodel = FMN()
     elif args['-m'] == "CTW:PTW":
         probmodel = model.CTW(depth, lambda: model.PTW())
     elif args['-m'] == "CTW:FMN":
         probmodel = model.CTW(depth, lambda: model.FMN())
     else:
-        raise Error()
+        raise ValueError('Unknown model string')
 
     infile = args['INFILE']
     outfile = args['OUTFILE']
@@ -84,7 +77,7 @@ if __name__ == "__main__":
         with open(infile, 'rb') as infs, open(outfile, 'wb') as outfs:
             outfs.write(msglen.to_bytes(4, sys.byteorder))
             
-            for b in ac.compress_bytes(probmodel, _bytes_with_progress(infs, msglen)):
+            for b in compress_bytes(probmodel, _bytes_with_progress(infs, msglen)):
                 codelen += 1
                 outfs.write(bytes([b]))
         elapsed_time = time.time() - start_time
@@ -103,5 +96,5 @@ if __name__ == "__main__":
             codelen = os.path.getsize(infile)
             msglen = int.from_bytes(infs.read(4), sys.byteorder)
 
-            for b in ac.decompress_bytes(model, _bytes_with_rprogress(infs), codelen):
+            for b in decompress_bytes(model, _bytes_with_rprogress(infs), codelen):
                 outfs.write(b)
