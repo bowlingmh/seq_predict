@@ -1,6 +1,9 @@
 COMPRESS
 ========
 
+Copyright (c) 2016 Michael Bowling <mbowling@ualberta.ca>
+See LICENSE for information on using or distributing the code.
+
 Module for compression and sequence prediction using Bayesian prediction models.
 
 Implements the following Bayesian models:
@@ -12,24 +15,29 @@ Implements the following Bayesian models:
 - An early version of Forget-Me-Not
 - Model combinations: Averaging, Factoring
 
-Most of the implementations are in pure python.  A CTW and CTS implementation
-with integer k-ary alphabets (i.e., 0, 1, ..., k) using KT estimators has a
-fast c-based implementation.
+Most of the implementations are in pure python.  CTW and CTS with integer k-ary
+alphabets (i.e., 0, 1, ..., k) using KT estimators has a fast c-based
+implementation.
 
 In addition, it includes an arithmetic binary coder.
 
 Using it for Compression
 ------------------------
 
-The program `z.py` is a command line compression tool that allows you to
-select one of the implemented models to use with compression.
+Executing the module on the command line invokes a compression tool that allows
+you to select one of the implemented models to use with an arithmetic encoder
+for compression.
+
+```bash
+python -m seq_predict compress FILE.TXT FILE.TXT.compressed -m CTW
+```
 
 Using it for Prediction 
 -----------------------
 
 The model classes can be imported as below.
 
-```
+```python
 from compress.models import PTW
 from compress.fast import CTS_KT
 ```
@@ -45,9 +53,3 @@ The models adhere to the following API:
 The history is optional for models that don't look at history (e.g., KT
 estimators).  The `*_seq` functions only make sense if appending symbols are how
 the history is updated.
-
-
-
-
-
-

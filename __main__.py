@@ -8,9 +8,8 @@ Options:
 -d DEPTH      Depth parameter used for CTW [default: 48]
 """
 
-from compress.model import PTW, FMN, KT
-from compress.fast import CTW_KT, CTS_KT
-from compress.ac import compress_bytes, decompress_bytes
+from . import PTW, FMN, KT, CTW_KT, CTS_KT
+from .ac import compress_bytes, decompress_bytes
 
 import docopt
 import os
@@ -59,9 +58,9 @@ if __name__ == "__main__":
     elif args['-m'] == "FMN":
         probmodel = FMN()
     elif args['-m'] == "CTW:PTW":
-        probmodel = model.CTW(depth, lambda: model.PTW())
+        probmodel = CTW(depth, lambda: PTW())
     elif args['-m'] == "CTW:FMN":
-        probmodel = model.CTW(depth, lambda: model.FMN())
+        probmodel = CTW(depth, lambda: FMN())
     else:
         raise ValueError('Unknown model string')
 
