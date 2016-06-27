@@ -13,7 +13,7 @@ def grouper(n, iterable, fillvalue=None):
     args = [iter(iterable)] * n
     return itertools.zip_longest(*args, fillvalue=fillvalue)
 
-def compress(model, bits):
+def compress_bits(model, bits):
     """Compresses a stream of bits into another stream of bits.
     Requires a prediction model.
     """
@@ -29,11 +29,11 @@ def compress_bytes(model, bytes):
     Requires a prediction model.
     """
     bits = ((m >> i) & 1 for m in bytes for i in range(8))
-    cbits = compress(model, bits)
+    cbits = compress_bits(model, bits)
     for c in (int(''.join(byte), 2) for byte in grouper(8, (str(b) for b in cbits), '0')):
         yield c
 
-def decompress(model, bits, msglen):
+def decompress_bits(model, bits, msglen):
     """Decompresses a stream of bits into another stream of bits.
     Requires the same prediction model (from its original state) that was
     used for decompression and the number of bits in the message.
@@ -52,7 +52,7 @@ def decompress_bytes(model, bytes, msglen):
     used for decompression and the number of bytes in the message.
     """
     cbits = ((m >> i) & 1 for m in bytes for i in range(8))
-    bits = decompress(model, cbits, msglen * 8)
+    bits = decompress_bits(model, cbits, msglen * 8)
     for r in (int(''.join(byte), 2) for byte in grouper(8, (str(b) for b in bits), '0')):
         yield r
 
