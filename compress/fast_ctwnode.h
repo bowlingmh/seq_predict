@@ -14,8 +14,8 @@ typedef struct _ctwnode_t {
   unsigned int _refcount;
 } ctwnode_t;
 
-double ctwnode_update(ctwnode_t *node, char symbol, char *context, int ctxtlen);
-double ctwnode_log_predict(ctwnode_t *node, char symbol, char *context, int ctxtlen);
+double ctwnode_update(ctwnode_t *node, unsigned char symbol, unsigned char *context, int ctxtlen);
+double ctwnode_log_predict(ctwnode_t *node, unsigned char symbol, unsigned char *context, int ctxtlen);
 ctwnode_t *ctwnode_new();
 ctwnode_t *ctwnode_copy(ctwnode_t *self);
 void ctwnode_free(ctwnode_t *self);

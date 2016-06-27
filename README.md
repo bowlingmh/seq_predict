@@ -21,7 +21,7 @@ In addition, it includes an arithmetic binary coder.
 Using it for Compression
 ------------------------
 
-The program `z.py` can is a command line compression tool that allows you to
+The program `z.py` is a command line compression tool that allows you to
 select one of the implemented models to use with compression.
 
 Using it for Prediction 

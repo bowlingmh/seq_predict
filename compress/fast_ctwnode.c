@@ -18,7 +18,8 @@ typedef struct _ctwnode_t {
   unsigned int _refcount;
 } ctwnode_t;
 
-const double one_over_alphabet_size = 1.0 / ALPHABET_SIZE;
+static const double kt_sum_counts = KT_SUM_COUNTS;
+static const double kt_start_count = kt_sum_counts / ALPHABET_SIZE;
 
 double logsumexp2(double a, double b)
 {
@@ -61,15 +62,15 @@ ctwnode_t *ctwnode_copy(ctwnode_t *self)
   return copy;
 }
   
-void ctwnode_base_update(ctwnode_t *self, char symbol)
+void ctwnode_base_update(ctwnode_t *self, unsigned char symbol)
 {
-  double sum_counts = 1;
+  double sum_counts = kt_sum_counts;
   for(int i=0; i<ALPHABET_SIZE; i++) sum_counts += self->base_counts[i];
-  self->base_log_prob += log((one_over_alphabet_size + self->base_counts[symbol]) / sum_counts);
+  self->base_log_prob += log((kt_start_count + self->base_counts[symbol]) / sum_counts);
   self->base_counts[symbol] += 1;
 }
 
-double ctwnode_update(ctwnode_t *self, char symbol, char *context, unsigned int ctxtlen)
+double ctwnode_update(ctwnode_t *self, unsigned char symbol, unsigned char *context, unsigned int ctxtlen)
 {
   double orig_log_prob = self->log_prob;
 
@@ -93,12 +94,12 @@ double ctwnode_update(ctwnode_t *self, char symbol, char *context, unsigned int 
   return self->log_prob - orig_log_prob;
 }
 
-double ctwnode_log_predict(ctwnode_t *self, char symbol, char *context, unsigned int ctxtlen)
+double ctwnode_log_predict(ctwnode_t *self, unsigned char symbol, unsigned char *context, unsigned int ctxtlen)
 {
-  double sum_counts = 1;
+  double sum_counts = kt_sum_counts;
   for(int i=0; i<ALPHABET_SIZE; i++) sum_counts += self->base_counts[i];
 
-  double base_log_prob = self->base_log_prob + log((one_over_alphabet_size + self->base_counts[symbol]) / sum_counts);
+  double base_log_prob = self->base_log_prob + log((kt_start_count + self->base_counts[symbol]) / sum_counts);
 
   if (ctxtlen) {
     int cnext = context[ctxtlen-1];
