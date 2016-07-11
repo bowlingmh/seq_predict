@@ -43,7 +43,9 @@ class CTW_KT(Model, FFIMixin):
     
     __slots__ = [ "tree", "depth", "c" ]
 
-    def __init__(self, depth, alphabet_size=2, kt_sum_counts=1.0):
+    def __init__(self, depth, alphabet_size=2, kt_sum_counts=1.0,
+                 mkcontext=None):
+        self.mkcontext = mkcontext if mkcontext else self._mkcontext 
         self.c = self._ffi(ALPHABET_SIZE=alphabet_size,
                            KT_SUM_COUNTS=kt_sum_counts)
         self.depth = depth
@@ -57,11 +59,11 @@ class CTW_KT(Model, FFIMixin):
         return bytes([0] * padding + x[-self.depth:])
         
     def update(self, symbol, history):
-        context = self._mkcontext(history)
+        context = self.mkcontext(history)
         return self.c.ctwnode_update(self.tree, symbol, context, self.depth)
 
     def log_predict(self, symbol, history):
-        context = self._mkcontext(history)
+        context = self.mkcontext(history)
         return self.c.ctwnode_log_predict(self.tree, symbol, context, self.depth)
 
     @property
@@ -89,7 +91,10 @@ class CTS_KT(Model, FFIMixin):
     
     __slots__ = [ "tree", "depth", "c", "t" ]
 
-    def __init__(self, depth, alphabet_size=2, kt_sum_counts=0.125, base_prior=0.125):
+    def __init__(self, depth, alphabet_size=2,
+                 kt_sum_counts=0.125, base_prior=0.125,
+                 mkcontext=None):
+        self.mkcontext = mkcontext if mkcontext else self._mkcontext 
         self.c = self._ffi(ALPHABET_SIZE=alphabet_size,
                            KT_SUM_COUNTS=kt_sum_counts,
                            BASE_PRIOR=base_prior)
@@ -109,7 +114,7 @@ class CTS_KT(Model, FFIMixin):
         return 1.0 / (self.t + 3)
     
     def update(self, symbol, history):
-        context = self._mkcontext(history)
+        context = self.mkcontext(history)
 
         log_alpha = math.log(self.alpha)
         log_blend = math.log(1 - 2 * self.alpha)
@@ -120,7 +125,7 @@ class CTS_KT(Model, FFIMixin):
         return lp
 
     def log_predict(self, symbol, history):
-        context = self._mkcontext(history)
+        context = self.mkcontext(history)
         return self.c.ctsnode_log_predict(self.tree, symbol, context, self.depth)
 
     @property
