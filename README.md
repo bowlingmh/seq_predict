@@ -1,10 +1,11 @@
-COMPRESS
-========
+Sequence Prediction
+===================
 
 Copyright (c) 2016 Michael Bowling <mbowling@ualberta.ca>
+
 See LICENSE for information on using or distributing the code.
 
-Module for compression and sequence prediction using Bayesian prediction models.
+Module for sequence prediction and compression using Bayesian prediction models.
 
 Implements the following Bayesian models:
 
