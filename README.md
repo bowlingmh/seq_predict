@@ -44,6 +44,7 @@ from compress.fast import CTS_KT
 ```
 
 The models adhere to the following API:
+
 - `predict(symbol, history)`
 - `log_predict(symbol, history)`
 - `log_predict_seq(symbols, history)`
