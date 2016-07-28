@@ -7,6 +7,7 @@ See LICENSE for information on using or distributing the code.
 Module for compression and sequence prediction using Bayesian prediction models.
 
 Implements the following Bayesian models:
+
 - KT 
 - SAD 
 - CTW
