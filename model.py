@@ -816,7 +816,7 @@ class Dumb(Model):
     don't want this model to bother (or be confused by) predicting actions.
     You can do this with Factored and Dumb.
 
-    >>> M = Factored((Dumb(), CTW_KT()))
+    >>> M = Factored((Dumb(), CTW_KT(8)))
     """
     
     def log_predict(self, symbol, history):

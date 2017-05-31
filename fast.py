@@ -27,7 +27,7 @@ class FFIMixin:
         if defs not in cls._ffi_cache:
             ffi = FFI()
             ffi.cdef(cls._ffi_prep_code(defs, cls._ffi_code_h))
-            cls._ffi_cache[defs] = ffi.verify(cls._ffi_prep_code(defs, cls._ffi_code_c))
+            cls._ffi_cache[defs] = ffi.verify(cls._ffi_prep_code(defs, cls._ffi_code_c), extra_compile_args=["-std=c99"])
         return cls._ffi_cache[defs]
 
     

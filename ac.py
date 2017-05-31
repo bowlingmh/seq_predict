@@ -9,6 +9,8 @@ The functions and classes all need predictive models; see model.py
 import math
 import itertools
 
+from . import CTW
+
 def grouper(n, iterable, fillvalue=None):
     args = [iter(iterable)] * n
     return itertools.zip_longest(*args, fillvalue=fillvalue)

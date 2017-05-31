@@ -1,12 +1,14 @@
-SEQ_PREDICT
-===========
+Sequence Prediction
+===================
 
 Copyright (c) 2016 Michael Bowling <mbowling@ualberta.ca>
+
 See LICENSE for information on using or distributing the code.
 
-Module for compression and sequence prediction using Bayesian prediction models.
+Module for sequence prediction and compression using Bayesian prediction models.
 
 Implements the following Bayesian models:
+
 - KT 
 - SAD 
 - CTW
@@ -43,6 +45,7 @@ from compress.fast import CTS_KT
 ```
 
 The models adhere to the following API:
+
 - `predict(symbol, history)`
 - `log_predict(symbol, history)`
 - `log_predict_seq(symbols, history)`

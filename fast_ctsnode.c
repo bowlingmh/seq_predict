@@ -20,7 +20,7 @@ typedef struct _ctsnode_t {
 } ctsnode_t;
 
 static const double kt_sum_counts = KT_SUM_COUNTS;
-static const double kt_start_count = kt_sum_counts / ALPHABET_SIZE;
+static const double kt_start_count = KT_SUM_COUNTS / ALPHABET_SIZE;
 
 double logsumexp2(double a, double b)
 {
@@ -31,7 +31,7 @@ double logsumexp2(double a, double b)
   }
 }
 
-ctsnode_t *ctsnode_new()
+ctsnode_t *ctsnode_new(void)
 {
   ctsnode_t *self = malloc(sizeof(ctsnode_t));
   for(int i=0; i<ALPHABET_SIZE; i++) self->base_counts[i] = 0;

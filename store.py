@@ -82,6 +82,7 @@ class LogStoreUniform:
             yield x
 
     def __getitem__(self, i):
+        if i < 0: i += len(self.items)
         return self.items[len(self.items) - i - 1]
         
     def add(self, x):
