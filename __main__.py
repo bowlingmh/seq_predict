@@ -1,7 +1,7 @@
 """General compression based on probabilistic models.
 
 Usage: z.py compress INFILE OUTFILE [-m MODEL] [-d DEPTH]
-       z.py uncompress INFILE OUTFILE [-m MODEL] [-d DEPTH]
+       z.py decompress INFILE OUTFILE [-m MODEL] [-d DEPTH]
 
 Options:
 -m MODEL      Prediction model [default: CTW]
@@ -91,9 +91,13 @@ if __name__ == "__main__":
         print("    {:15} {:7.4f} MB".format("Memory Used:", resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1e6))
 
     elif args['decompress']:
+        msglen = os.path.getsize(infile)
+        codelen = 0
+
+        print("Decompressing {} ({} bytes)\n".format(infile, msglen))
         with open(infile, 'rb') as infs, open(outfile, 'wb') as outfs:
             codelen = os.path.getsize(infile)
             msglen = int.from_bytes(infs.read(4), sys.byteorder)
 
-            for b in decompress_bytes(model, _bytes_with_rprogress(infs), codelen):
-                outfs.write(b)
+            for b in decompress_bytes(probmodel, _bytes_with_progress(infs, msglen), codelen):
+                outfs.write(bytes([b]))

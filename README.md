@@ -1,5 +1,5 @@
-COMPRESS
-========
+SEQ_PREDICT
+===========
 
 Copyright (c) 2016 Michael Bowling <mbowling@ualberta.ca>
 See LICENSE for information on using or distributing the code.

@@ -30,7 +30,7 @@ def compress_bytes(model, bytes):
     """
     bits = ((m >> i) & 1 for m in bytes for i in range(8))
     cbits = compress_bits(model, bits)
-    for c in (int(''.join(byte), 2) for byte in grouper(8, (str(b) for b in cbits), '0')):
+    for c in (int(''.join(reversed(byte)), 2) for byte in grouper(8, (str(b) for b in cbits), '0')):
         yield c
 
 def decompress_bits(model, bits, msglen):
@@ -40,7 +40,7 @@ def decompress_bits(model, bits, msglen):
     """
     decoder = BinaryArithmeticDecoder(model)
     nbits = 0
-    for r in itertools.chain(*(decoder.decode(b) for b in bits)):
+    for r in itertools.chain.from_iterable((decoder.decode(b) for b in bits)):
         yield r
         nbits += 1
     for r in decoder.flush(msglen - nbits):
@@ -53,7 +53,7 @@ def decompress_bytes(model, bytes, msglen):
     """
     cbits = ((m >> i) & 1 for m in bytes for i in range(8))
     bits = decompress_bits(model, cbits, msglen * 8)
-    for r in (int(''.join(byte), 2) for byte in grouper(8, (str(b) for b in bits), '0')):
+    for r in (int(''.join(reversed(byte)), 2) for byte in grouper(8, (str(b) for b in bits), '0')):
         yield r
 
 class BinaryArithmeticEncoder:
@@ -74,7 +74,7 @@ class BinaryArithmeticEncoder:
         self._top = 2 ** self.num_bits 
         self._half = self._top // 2  # [0, self._half) is outputs the zero bit
         self._1_4 = self._half // 2
-        self._3_4 = self._top - self._half
+        self._3_4 = self._top - self._1_4
 
         self.low = 0 # Interval is [self.low, self.high)
         self.high = self._top 
@@ -95,12 +95,13 @@ class BinaryArithmeticEncoder:
         output = []
 
         # Find the split point 
-        p_symbol = math.exp(self.model.update(symbol, self.history))
-        self.history.append(symbol)
-
-        p_zero = p_symbol if symbol == 0 else 1 - p_symbol
+        p_zero = self.model.predict(0, self.history)
         split = self.low + max(1, int((self.high - self.low) * p_zero)) # 0-interval is [self.low, split)
 
+        # Update the model
+        self.model.update(symbol, self.history)
+        self.history.append(symbol)
+        
         # Update the range based on the observed symbol
         if symbol:
             self.low = split
@@ -169,8 +170,12 @@ class BinaryArithmeticDecoder:
         self.high = 1 # This ensures num_bits are read before decoding
         self.value = 0
 
+        self.history = []
+
     def decode(self, bit):
-        if self.low >= self._half:
+        if self.high <= self._half:
+            pass
+        elif self.low >= self._half:
             self.value -= self._half
             self.low -= self._half
             self.high -= self._half
@@ -185,14 +190,15 @@ class BinaryArithmeticDecoder:
         self.value += bit
 
         output = []
-        
-        while self.low < self._half < self.high:
-            p_zero = self.model.predict(0)
-            split = self.low + int((self.high - self.low) * p_zero) # 0-interval is [self.low, split)
 
+        while (self.low < self._half < self.high and
+                ((self.low < self._1_4 or self.high > self._3_4))):
+            p_zero = self.model.predict(0, self.history)
+            split = self.low + max(1, int((self.high - self.low) * p_zero)) # 0-interval is [self.low, split)
             symbol = 0 if self.value < split else 1
             output.append(symbol)
-            self.model.update(symbol)
+            self.model.update(symbol, self.history)
+            self.history.append(symbol)
             
             if symbol:
                 self.low = split
